@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>cabbyVIEW - Where GUEST EXPERIENCE is a priority!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="../content/icons/tp.ico" />
+    <link rel="stylesheet" href="../content/jquery.mobile.min.css" />
+    <link rel="stylesheet" href="../content/cabbyviewapp.css" />
+    <script type="text/javascript" src="../scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="../scripts/jquery.mobile.min.js"></script>
+    <script type="text/javascript" src="../scripts/cabbyviewapp.js"></script>
+</head>
+<body>
+    <div data-role="page">
+	    <div data-role="header" data-theme="b">
+            <h1>cabbyVIEW</h1>
+            <a href="tel:4169979933" data-role="button" data-icon="ivr" data-iconpos="notext" target="_self" title="Assistance!"></a>
+	    </div><!-- /header -->
+	    <div data-role="content">
+            <form id="frmLogin">
+                <div class="ui-grid-solo" align="left">
+                    <h3>COMMAND STATION</h3>
+                </div>
+                <div class="ui-grid-solo">
+                    <label for="inpUsername" class="ui-hidden-accessible">
+                        Username:</label>
+                    <input type="text" id="inpUsername" value="test1" placeholder="username" data-theme="a" name="username" />
+                </div>
+                <div class="ui-grid-solo">
+                    <label for="inpPassword" class="ui-hidden-accessible">
+                        Password:</label>
+                    <input type="password" id="inpPassword" value="pass1" placeholder="password" data-theme="a" name="password" />
+                </div>
+            </form>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <button type="submit" data-theme="b" data-icon="arrow-r" data-iconpos="left" id="btnStart">Start</button>
+                </div>
+                    <button type="submit" data-theme="c" data-icon="arrow-r" data-iconpos="left" id="btnStop">Stop</button>
+                <div class="ui-block-b">
+                </div>
+            </div>
+            <div class="ui-grid-solo" align="center" id="geoLoc">
+            </div>
+        </div><!-- /content -->
+    </div><!-- /page -->
+</body>
+</html>
