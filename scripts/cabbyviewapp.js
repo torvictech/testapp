@@ -1,7 +1,12 @@
 ﻿//Global Variables
-var cabbyUser = '';
-var cabbyPass = '';
 top.updateId = '';
+top.startedCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/startedCabby';
+top.updateCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/updateCabby';
+top.stopCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/stopCabby';
+//Local URLs
+//top.startedCabbyURL = '../../cvservice.asmx/startedCabby';
+//top.updateCabbyURL = '../../cvservice.asmx/updateCabby';
+//top.stopCabbyURL = '../../cvservice.asmx/stopCabby';
 
 //Supporting Functions
 function getLongDT() {
@@ -18,18 +23,12 @@ function getLongDT() {
     return dtNow; //long date format: yyyy-MM-dd h:mm:ss PM/AM
 }
 
-//Core Functions
-function appStarted() {
+function startedApp() {
     getLongDT();
-    cabbyUser = $('#inpUsername').val();
-    cabbyPass = $('#inpPassword').val();
-    showUpdates();
-    top.updateId = setInterval(showUpdates, 15000); //60,000 milliseconds is one minute - Using 5 (15000) second updates
-}
-
-function showUpdates() {
+    var cabbyUser = $('#inpUsername').val();
+    var cabbyPass = $('#inpPassword').val();
     if (cabbyUser == '' || cabbyPass == '') {
-        alert('cabbyVIEW ERROR: Username & password fields are mandatory!');
+        alert('cabbyVIEW ALERT: Enter your username & password, to start!');
     } else {
         if (navigator.onLine) {
             if (navigator.geolocation) {
@@ -40,21 +39,45 @@ function showUpdates() {
                         beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
                         complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
                         type: 'POST',
-                        url: 'http://www.cabbyview.com/cvservice.asmx/setCabby',
+                        url: top.startedCabbyURL,
                         cache: false,
-                        data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","lat":"' + cabbyLat + '","lng":"' + cabbyLng + '","dtnow":"' + dtNow + '"}',
+                        data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","dtnow":"' + dtNow + '"}',
                         contentType: 'application/json; charset=utf-8',
                         success: function (e) {
                             if (e.d == 'error') {
                                 alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
                             } else {
-                                $('#btnStart').closest('.ui-btn').hide();
-                                $('#btnStop').closest('.ui-btn').show();
-                                $('#geoLoc').html('<br />Lat: ' + cabbyLat + ' Lng: ' + cabbyLng).trigger('create');
+                                var objNDS = jQuery.parseJSON(e.d);
+                                var objTbl = objNDS.NewDataSet.Table;
+                                if (objTbl instanceof Array) {
+                                    $.each(objTbl, function (i, val) {
+                                        if (val.CABBY_ACTIVE == "yes") {
+                                            $('#btnStart').closest('.ui-btn').hide();
+                                            $('#btnStop').closest('.ui-btn').show();
+                                            $('#geoLoc').html('<br />Lat: ' + cabbyLat + ' Lng: ' + cabbyLng).trigger('create');
+                                            intervalApp();
+                                        } else {
+                                            $('#btnStart').closest('.ui-btn').show();
+                                            $('#btnStop').closest('.ui-btn').hide();
+                                            $('#geoLoc').html('');
+                                        }
+                                    });
+                                } else {
+                                    if (objTbl.CABBY_ACTIVE == "yes") {
+                                        $('#btnStart').closest('.ui-btn').hide();
+                                        $('#btnStop').closest('.ui-btn').show();
+                                        $('#geoLoc').html('<br />Lat: ' + cabbyLat + ' Lng: ' + cabbyLng).trigger('create');
+                                        intervalApp();
+                                    } else {
+                                        $('#btnStart').closest('.ui-btn').show();
+                                        $('#btnStop').closest('.ui-btn').hide();
+                                        $('#geoLoc').html('');
+                                    }
+                                }
                             }
                         },
                         error: function (e) {
-                            alert('cabbyVIEW ERROR: Unable to update your location at this time, trying again!');
+                            alert('cabbyVIEW ERROR: Unable to obtain data at this time, trying again!');
                         }
                     });
                 });
@@ -68,55 +91,149 @@ function showUpdates() {
     return false;
 }
 
-//App Init
-$(document).on('pageinit', function () {
-    if (!navigator.geolocation) {
-        alert('cabbyVIEW ERROR: You must enable your GPS/Geolocation to use this application!');
+function startApp() {
+    getLongDT();
+    var cabbyUser = $('#inpUsername').val();
+    var cabbyPass = $('#inpPassword').val();
+    if (cabbyUser == '' || cabbyPass == '') {
+        alert('cabbyVIEW ERROR: Username & password fields are mandatory, to start!');
     } else {
-        if (top.updateId == '' || top.updateId == null) {
-            $('#btnStop').closest('.ui-btn').hide();
+        if (navigator.onLine) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var cabbyLat = position.coords.latitude;
+                    var cabbyLng = position.coords.longitude;
+                    $.ajax({
+                        beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
+                        complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
+                        type: 'POST',
+                        url: top.updateCabbyURL,
+                        cache: false,
+                        data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","lat":"' + cabbyLat + '","lng":"' + cabbyLng + '","dtnow":"' + dtNow + '"}',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (e) {
+                            if (e.d == 'error') {
+                                alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
+                            } else {
+                                $('#btnStart').closest('.ui-btn').hide();
+                                $('#btnStop').closest('.ui-btn').show();
+                                $('#geoLoc').html('<br />Lat: ' + cabbyLat + ' Lng: ' + cabbyLng).trigger('create');
+                                intervalApp();
+                            }
+                        },
+                        error: function (e) {
+                            alert('cabbyVIEW ERROR: Unable to obtain data at this time, trying again!');
+                        }
+                    });
+                });
+            } else {
+                alert('cabbyVIEW ERROR: You must enable your GPS/Geolocation to use this application!');
+            }
+        } else {
+            InternetError();
         }
     }
+    return false;
+}
+
+function stopApp() {
+    getLongDT();
+    var cabbyUser = $('#inpUsername').val();
+    var cabbyPass = $('#inpPassword').val();
+    if (cabbyUser == '' || cabbyPass == '') {
+        alert('cabbyVIEW ALERT: Enter your username & password, to stop!');
+    } else {
+        if (navigator.onLine) {
+            $.ajax({
+                beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
+                complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
+                type: 'POST',
+                url: top.stopCabbyURL,
+                cache: false,
+                data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","dtnow":"' + dtNow + '"}',
+                contentType: 'application/json; charset=utf-8',
+                success: function (e) {
+                    if (e.d == 'error') {
+                        alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
+                    } else {
+                        $('#btnStart').closest('.ui-btn').show();
+                        $('#btnStop').closest('.ui-btn').hide();
+                        $('#geoLoc').html('');
+                        clearInterval(top.updateId);
+                        top.updateId = '';
+                    }
+                },
+                error: function (e) {
+                    alert('cabbyVIEW ERROR: Unable to stop at this time, trying again!');
+                }
+            });
+        } else {
+            InternetError();
+        }
+    }
+    return false;
+}
+
+function updateApp() {
+    getLongDT();
+    var cabbyUser = $('#inpUsername').val();
+    var cabbyPass = $('#inpPassword').val();
+    if (cabbyUser == '' || cabbyPass == '') {
+        alert('cabbyVIEW ERROR: Username & password fields are mandatory, to start!');
+    } else {
+        if (navigator.onLine) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var cabbyLat = position.coords.latitude;
+                    var cabbyLng = position.coords.longitude;
+                    $.ajax({
+                        beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
+                        complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
+                        type: 'POST',
+                        url: top.updateCabbyURL,
+                        cache: false,
+                        data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","lat":"' + cabbyLat + '","lng":"' + cabbyLng + '","dtnow":"' + dtNow + '"}',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (e) {
+                            if (e.d == 'error') {
+                                alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
+                            } else {
+                                $('#btnStart').closest('.ui-btn').hide();
+                                $('#btnStop').closest('.ui-btn').show();
+                                $('#geoLoc').html('<br />Lat: ' + cabbyLat + ' Lng: ' + cabbyLng).trigger('create');
+                            }
+                        },
+                        error: function (e) {
+                            alert('cabbyVIEW ERROR: Unable to obtain data at this time, trying again!');
+                        }
+                    });
+                });
+            } else {
+                alert('cabbyVIEW ERROR: You must enable your GPS/Geolocation to use this application!');
+            }
+        } else {
+            InternetError();
+        }
+    }
+    return false;
+}
+
+function intervalApp() {
+    top.updateId = setInterval(updateApp, 10000); //60,000 milliseconds is one minute
+}
+
+//App Init
+$(document).on('pageinit', function () {
+    $('#btnStop').closest('.ui-btn').hide();
+    startedApp();
 });
 
 //App Start
 $('#btnStart').live('click', function () {
-    appStarted();
+    startApp();
 });
 
 //App Stop
 $('#btnStop').live('click', function () {
-    $.ajax({
-        beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
-        complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
-        type: 'POST',
-        url: 'http://www.cabbyview.com/cvservice.asmx/stopCabby',
-        cache: false,
-        data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","dtnow":"' + dtNow + '"}',
-        contentType: 'application/json; charset=utf-8',
-        success: function (e) {
-            if (e.d == 'error') {
-                alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
-            } else {
-                $('#btnStart').closest('.ui-btn').show();
-                $('#btnStop').closest('.ui-btn').hide();
-                $('#geoLoc').html('');
-                clearInterval(updateId);
-                cabbyUser = '';
-                cabbyPass = '';
-                top.updateId = '';
-            }
-        },
-        error: function (e) {
-            alert('cabbyVIEW ERROR: Unable to stop at this time, trying again!');
-        }
-    });
-});
-
-//App Exit
-$('#btnQuit').live('click', function () {
-    cabbyUser = '';
-    cabbyPass = '';
-    top.updateId = '';
-    navigator.app.exitApp();
+    stopApp();
 });

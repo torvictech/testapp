@@ -10,6 +10,7 @@
     <script type="text/javascript" src="http://www.cabbyview.com/app/scripts/jquery.min.js"></script>
     <script type="text/javascript" src="http://www.cabbyview.com/app/scripts/jquery.mobile.min.js"></script>
     <script type="text/javascript" src="http://www.cabbyview.com/app/scripts/cabbyviewapp.js"></script>
+    <!--<script type="text/javascript" src="../app/scripts/cabbyviewapp.js"></script>-->
     <script type="text/javascript">
         $(document).bind("mobileinit", function () {
             $.mobile.ajaxEnabled = true;
@@ -28,9 +29,8 @@
 <body>
     <div data-role="page">
 	    <div data-role="header" data-theme="b">
-            <a href="tel:4169979933" data-role="button" data-icon="ivr" data-iconpos="notext" target="_self" title="Assistance!"></a>
             <h1>cabbyVIEW</h1>
-            <a href="#" data-role="button" data-icon="delete" data-iconpos="notext" id="btnQuit" title="Quit!"></a>
+            <a href="tel:4169979933" data-icon="ivr" data-iconpos="notext" target="_self" class="ui-btn-right"></a>
 	    </div><!-- /header -->
 	    <div data-role="content">
             <form id="frmLogin">
