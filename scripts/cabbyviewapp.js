@@ -1,7 +1,7 @@
 ﻿//Global Variables
-var cabbyUser;
-var cabbyPass;
-var updateId;
+var cabbyUser = '';
+var cabbyPass = '';
+top.updateId = '';
 
 //Supporting Functions
 function getLongDT() {
@@ -19,6 +19,14 @@ function getLongDT() {
 }
 
 //Core Functions
+function appStarted() {
+    getLongDT();
+    cabbyUser = $('#inpUsername').val();
+    cabbyPass = $('#inpPassword').val();
+    showUpdates();
+    top.updateId = setInterval(showUpdates, 15000); //60,000 milliseconds is one minute - Using 5 (15000) second updates
+}
+
 function showUpdates() {
     if (cabbyUser == '' || cabbyPass == '') {
         alert('cabbyVIEW ERROR: Username & password fields are mandatory!');
@@ -60,22 +68,20 @@ function showUpdates() {
     return false;
 }
 
-//GPS Check
+//App Init
 $(document).on('pageinit', function () {
     if (!navigator.geolocation) {
         alert('cabbyVIEW ERROR: You must enable your GPS/Geolocation to use this application!');
+    } else {
+        if (top.updateId == '' || top.updateId == null) {
+            $('#btnStop').closest('.ui-btn').hide();
+        }
     }
-    $('#btnStop').closest('.ui-btn').hide();
 });
 
 //App Start
 $('#btnStart').live('click', function () {
-    getLongDT();
-    cabbyUser = $('#inpUsername').val();
-    cabbyPass = $('#inpPassword').val();
-    showUpdates();
-    updateId = setInterval(showUpdates, 5000); //60,000 milliseconds is one minute - Using 5 (5000) second updates
-    return false;
+    appStarted();
 });
 
 //App Stop
@@ -96,11 +102,21 @@ $('#btnStop').live('click', function () {
                 $('#btnStop').closest('.ui-btn').hide();
                 $('#geoLoc').html('');
                 clearInterval(updateId);
+                cabbyUser = '';
+                cabbyPass = '';
+                top.updateId = '';
             }
         },
         error: function (e) {
-            alert('cabbyVIEW ERROR: Unable to update your location at this time, trying again!');
+            alert('cabbyVIEW ERROR: Unable to stop at this time, trying again!');
         }
     });
-    return false;
+});
+
+//App Exit
+$('#btnQuit').live('click', function () {
+    cabbyUser = '';
+    cabbyPass = '';
+    top.updateId = '';
+    navigator.app.exitApp();
 });

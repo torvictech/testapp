@@ -10,12 +10,27 @@
     <script type="text/javascript" src="http://www.cabbyview.com/app/scripts/jquery.min.js"></script>
     <script type="text/javascript" src="http://www.cabbyview.com/app/scripts/jquery.mobile.min.js"></script>
     <script type="text/javascript" src="http://www.cabbyview.com/app/scripts/cabbyviewapp.js"></script>
+    <script type="text/javascript">
+        $(document).bind("mobileinit", function () {
+            $.mobile.ajaxEnabled = true;
+            $.mobile.selectmenu.prototype.options.nativeMenu = false;
+            $.mobile.loader.prototype.options.text = "PROCESSING...";
+            $.mobile.loader.prototype.options.textVisible = true;
+            $.mobile.loader.prototype.options.theme = "f";
+            //PhoneGap
+            $.support.cors = true;
+            $.mobile.allowCrossDomainPages = true;
+            $.mobile.buttonMarkup.hoverDelay = 0;
+            $.mobile.phonegapNavigationEnabled = true
+        });
+    </script>
 </head>
 <body>
     <div data-role="page">
 	    <div data-role="header" data-theme="b">
-            <h1>cabbyVIEW</h1>
             <a href="tel:4169979933" data-role="button" data-icon="ivr" data-iconpos="notext" target="_self" title="Assistance!"></a>
+            <h1>cabbyVIEW</h1>
+            <a href="#" data-role="button" data-icon="delete" data-iconpos="notext" id="btnQuit" title="Quit!"></a>
 	    </div><!-- /header -->
 	    <div data-role="content">
             <form id="frmLogin">
@@ -25,12 +40,12 @@
                 <div class="ui-grid-solo">
                     <label for="inpUsername" class="ui-hidden-accessible">
                         Username:</label>
-                    <input type="text" id="inpUsername" value="test1" placeholder="username" data-theme="a" name="username" />
+                    <input type="text" id="inpUsername" value="" placeholder="username" data-theme="a" name="username" />
                 </div>
                 <div class="ui-grid-solo">
                     <label for="inpPassword" class="ui-hidden-accessible">
                         Password:</label>
-                    <input type="password" id="inpPassword" value="pass1" placeholder="password" data-theme="a" name="password" />
+                    <input type="password" id="inpPassword" value="" placeholder="password" data-theme="a" name="password" />
                 </div>
             </form>
             <div class="ui-grid-a">
