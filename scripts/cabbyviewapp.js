@@ -223,10 +223,10 @@ function intervalApp() {
 }
 
 //App Init
-$(document).on('pageinit', function () {
-    $('#btnStop').closest('.ui-btn').hide();
-    startedApp();
-});
+//$(document).on('pageinit', function () {
+//    $('#btnStop').closest('.ui-btn').hide();
+//    startedApp();
+//});
 
 //App Start
 $('#btnStart').live('click', function () {

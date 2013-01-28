@@ -18,15 +18,33 @@
             $.mobile.loader.prototype.options.text = "PROCESSING...";
             $.mobile.loader.prototype.options.textVisible = true;
             $.mobile.loader.prototype.options.theme = "f";
-            //PhoneGap
+            //jQuery Mobile - PhoneGap
             $.support.cors = true;
             $.mobile.allowCrossDomainPages = true;
             $.mobile.buttonMarkup.hoverDelay = 0;
             $.mobile.phonegapNavigationEnabled = true
         });
+        //PhoneGap
+        function onLoad() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        function onDeviceReady() {
+            $('#btnStop').closest('.ui-btn').hide();
+            document.addEventListener("pause", onPause, false);
+            document.addEventListener("resume", onResume, false);
+        }
+        function onPause() {
+            top.cabbyUser = $('#inpUsername').val();
+            top.cabbyPass = $('#inpPassword').val();
+        }
+        function onResume() {
+            $('#inpUsername').val() = top.cabbyUser;
+            $('#inpPassword').val() = top.cabbyPass;
+            startedApp();
+        }
     </script>
 </head>
-<body>
+<body onload="onLoad();">
     <div data-role="page">
 	    <div data-role="header" data-theme="b">
             <h1>cabbyVIEW</h1>
