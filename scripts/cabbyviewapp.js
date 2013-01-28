@@ -32,7 +32,7 @@ function showUpdates() {
                         beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
                         complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
                         type: 'POST',
-                        url: '../wsapp.asmx/setCabby',
+                        url: 'http://www.cabbyview.com/cvservice.asmx/setCabby',
                         cache: false,
                         data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","lat":"' + cabbyLat + '","lng":"' + cabbyLng + '","dtnow":"' + dtNow + '"}',
                         contentType: 'application/json; charset=utf-8',
@@ -84,7 +84,7 @@ $('#btnStop').live('click', function () {
         beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
         complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
         type: 'POST',
-        url: '../wsapp.asmx/stopCabby',
+        url: 'http://www.cabbyview.com/cvservice.asmx/stopCabby',
         cache: false,
         data: '{"user":"' + cabbyUser + '","pass":"' + cabbyPass + '","dtnow":"' + dtNow + '"}',
         contentType: 'application/json; charset=utf-8',
