@@ -1,18 +1,10 @@
 ﻿//Global Variables
-top.updateId;
-top.cabbyUser;
-top.cabbyPass;
-top.cabbyIsActive;
-//Internet URLs
-top.loginCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/loginCabby';
-top.activeCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/activeCabby';
-top.updateCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/updateCabby';
-top.stopCabbyURL = 'http://www.cabbyview.com/cvservice.asmx/stopCabby';
-//Local URLs
-//top.loginCabbyURL = '../../cvservice.asmx/loginCabby';
-//top.activeCabbyURL = '../../cvservice.asmx/activeCabby';
-//top.updateCabbyURL = '../../cvservice.asmx/updateCabby';
-//top.stopCabbyURL = '../../cvservice.asmx/stopCabby';
+top.updateId = '';
+top.pinUser = '';
+top.pinPswd = '';
+top.pinActive = '';
+//var wsURL = 'http://www.mapitpro.com/mipservice.asmx/';
+var wsURL = '../mipservice.asmx/';
 
 //Supporting Functions
 function getLongDT() {
@@ -29,9 +21,22 @@ function getLongDT() {
     return dtNow; //long date format: yyyy-MM-dd h:mm:ss PM/AM
 }
 
-function loginApp() {
-    if (top.cabbyUser == '' || top.cabbyPass == '') {
-        alert('cabbyVIEW ERROR: Username & password fields are mandatory!');
+function appInterval() {
+    top.updateId = setInterval(appUpdate, 10000); //60,000 milliseconds is one minute
+    top.pinActive = true;
+}
+
+function internetError() {
+    alert('MapitPRO ERROR: Internet connectivity is unavailable!');
+}
+
+function technicalError() {
+    alert('MapitPRO ERROR: System is undergoing technical upgrades... Try again!');
+}
+
+function appLogin() {
+    if (top.pinUser == '' || top.pinPswd == '') {
+        alert('MapitPRO ERROR: Username & password fields are mandatory!');
     } else {
         if (navigator.onLine) {
             getLongDT();
@@ -39,55 +44,61 @@ function loginApp() {
                 beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
                 complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
                 type: 'POST',
-                url: top.loginCabbyURL,
+                url: wsURL + 'appLogin',
                 cache: false,
-                data: '{"user":"' + top.cabbyUser + '","pass":"' + top.cabbyPass + '","dtnow":"' + dtNow + '"}',
+                data: '{"user":"' + top.pinUser + '","pass":"' + top.pinPswd + '","dtnow":"' + dtNow + '"}',
                 contentType: 'application/json; charset=utf-8',
                 success: function (e) {
                     if (e.d == 'error') {
-                        alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
+                        alert('MapitPRO ERROR: Username or password is not valid... Try again!');
                     } else {
-                        $('#inpUsername').textinput('disable');
-                        $('#inpPassword').textinput('disable');
-                        $('#btnLogin').closest('.ui-btn').hide();
-                        $('#btnLogout').closest('.ui-btn').show();
-                        activeApp();
+                        var objNDS = jQuery.parseJSON(e.d);
+                        var objTbl = objNDS.NewDataSet.Table;
+                        if (objTbl.PIN_AUTHORIZED == 'true') {
+                            $('#inpUsername').textinput('disable');
+                            $('#inpPassword').textinput('disable');
+                            $('#btnLogin').closest('.ui-btn').hide();
+                            $('#btnLogout').closest('.ui-btn').show();
+                            appActive();
+                        } else {
+                            alert('MapitPRO ERROR: Username is not authorized... Contact your system administrator!');
+                        }
                     }
                 },
                 error: function (e) {
-                    alert('cabbyVIEW ERROR: Unable to obtain data at this time, trying again!');
+                    technicalError();
                 }
             });
         } else {
-            InternetError();
+            internetError();
         }
     }
     return false;
 }
 
-function activeApp() {
+function appActive() {
     if (navigator.onLine) {
         getLongDT();
         $.ajax({
             beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
             complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
             type: 'POST',
-            url: top.activeCabbyURL,
+            url: wsURL + 'appActive',
             cache: false,
-            data: '{"user":"' + top.cabbyUser + '","pass":"' + top.cabbyPass + '","dtnow":"' + dtNow + '"}',
+            data: '{"user":"' + top.pinUser + '","pass":"' + top.pinPswd + '","dtnow":"' + dtNow + '"}',
             contentType: 'application/json; charset=utf-8',
             success: function (e) {
                 if (e.d == 'error') {
-                    alert('cabbyVIEW ERROR: Username or password is not valid... Try again!');
+                    alert('MapitPRO ERROR: Username or password is not valid... Try again!');
                 } else {
                     var objNDS = jQuery.parseJSON(e.d);
                     var objTbl = objNDS.NewDataSet.Table;
                     if (objTbl instanceof Array) {
                         $.each(objTbl, function (i, val) {
-                            if (val.CABBY_ACTIVE == "yes") {
+                            if (val.PIN_ACTIVE == 'true') {
                                 $('#btnStart').closest('.ui-btn').hide();
                                 $('#btnStop').closest('.ui-btn').show();
-                                intervalApp();
+                                appInterval();
                             } else {
                                 $('#btnStart').closest('.ui-btn').show();
                                 $('#btnStop').closest('.ui-btn').hide();
@@ -95,10 +106,10 @@ function activeApp() {
                             }
                         });
                     } else {
-                        if (objTbl.CABBY_ACTIVE == "yes") {
+                        if (objTbl.PIN_ACTIVE == 'true') {
                             $('#btnStart').closest('.ui-btn').hide();
                             $('#btnStop').closest('.ui-btn').show();
-                            intervalApp();
+                            appInterval();
                         } else {
                             $('#btnStart').closest('.ui-btn').show();
                             $('#btnStop').closest('.ui-btn').hide();
@@ -108,93 +119,97 @@ function activeApp() {
                 }
             },
             error: function (e) {
-                alert('cabbyVIEW ERROR: Unable to obtain data at this time, trying again!');
+                technicalError();
             }
         });
     } else {
-        InternetError();
+        internetError();
     }
     return false;
 }
 
-function updateApp() {
+function appUpdate() {
     if (navigator.onLine) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
-                var cabbyLat = position.coords.latitude;
-                var cabbyLng = position.coords.longitude;
+                var pinLat = position.coords.latitude;
+                var pinLng = position.coords.longitude;
                 getLongDT();
                 $.ajax({
                     beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
                     complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
                     type: 'POST',
-                    url: top.updateCabbyURL,
+                    url: wsURL + 'appUpdate',
                     cache: false,
-                    data: '{"user":"' + top.cabbyUser + '","pass":"' + top.cabbyPass + '","lat":"' + cabbyLat + '","lng":"' + cabbyLng + '","dtnow":"' + dtNow + '"}',
+                    data: '{"user":"' + top.pinUser + '","pass":"' + top.pinPswd + '","lat":"' + pinLat + '","lng":"' + pinLng + '","dtnow":"' + dtNow + '"}',
                     contentType: 'application/json; charset=utf-8',
                     success: function (e) {
-                        if (e.d != 'error') {
-                            $('#geoLoc').html('<br />Lat: ' + cabbyLat + ' Lng: ' + cabbyLng).trigger('create');
+                        if (e.d == 'success') {
+                            $('#geoLoc').html('<br />Lat: ' + pinLat + ' Lng: ' + pinLng).trigger('create');
+                        } else {
+                            alert('MapitPRO ERROR: Unable to update location... Quit application and try again!');
                         }
                     },
                     error: function (e) {
-                        alert('cabbyVIEW ERROR: Unable to obtain data at this time, trying again!');
+                        technicalError();
                     }
                 });
             });
         } else {
-            alert('cabbyVIEW ERROR: You must enable your GPS/Geolocation to use this application!');
+            alert('MapitPRO ERROR: You must enable your GPS/Geolocation on your device to use this application!');
         }
     } else {
-        InternetError();
+        internetError();
     }
     return false;
 }
 
-function stopApp() {
+function appStop() {
     if (navigator.onLine) {
         getLongDT();
         $.ajax({
             beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
             complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
             type: 'POST',
-            url: top.stopCabbyURL,
+            url: wsURL + 'appStop',
             cache: false,
-            data: '{"user":"' + top.cabbyUser + '","pass":"' + top.cabbyPass + '","dtnow":"' + dtNow + '"}',
+            data: '{"user":"' + top.pinUser + '","pass":"' + top.pinPswd + '","dtnow":"' + dtNow + '"}',
             contentType: 'application/json; charset=utf-8',
             success: function (e) {
-                if (e.d != 'error') {
+                if (e.d == 'success') {
                     $('#btnStart').closest('.ui-btn').show();
                     $('#btnStop').closest('.ui-btn').hide();
                     $('#geoLoc').html('');
                     clearInterval(top.updateId);
                     top.updateId = '';
-                    top.cabbyIsActive = false;
+                    top.pinActive = false;
+                } else {
+                    alert('MapitPRO ERROR: Unable to stop application... Quit application and try again!');
                 }
             },
             error: function (e) {
-                alert('cabbyVIEW ERROR: Unable to stop at this time, trying again!');
+                technicalError();
             }
         });
     } else {
-        InternetError();
+        internetError();
     }
     return false;
 }
 
-function logoutApp() {
+function appLogout() {
     if (navigator.onLine) {
         getLongDT();
         $.ajax({
             beforeSend: function () { $.mobile.showPageLoadingMsg(); }, //Show spinner
             complete: function () { $.mobile.hidePageLoadingMsg() }, //Hide spinner
             type: 'POST',
-            url: top.stopCabbyURL,
+            url: wsURL + 'appStop',
             cache: false,
-            data: '{"user":"' + top.cabbyUser + '","pass":"' + top.cabbyPass + '","dtnow":"' + dtNow + '"}',
+            data: '{"user":"' + top.pinUser + '","pass":"' + top.pinPswd + '","dtnow":"' + dtNow + '"}',
             contentType: 'application/json; charset=utf-8',
             success: function (e) {
-                if (e.d != 'error') {
+                if (e.d == 'success') {
                     $('#inpUsername').textinput('enable');
                     $('#inpPassword').textinput('enable');
                     $('#btnLogin').closest('.ui-btn').show();
@@ -204,47 +219,44 @@ function logoutApp() {
                     $('#geoLoc').html('');
                     clearInterval(top.updateId);
                     top.updateId = '';
-                    top.cabbyIsActive = false;
+                    top.pinActive = false;
+                } else {
+                    alert('MapitPRO ERROR: Unable to stop application... Quit application and try again!');
                 }
             },
             error: function (e) {
-                alert('cabbyVIEW ERROR: Unable to stop at this time, trying again!');
+                technicalError();
             }
         });
     } else {
-        InternetError();
+        internetError();
     }
     return false;
 }
 
-function intervalApp() {
-    top.updateId = setInterval(updateApp, 10000); //60,000 milliseconds is one minute
-    top.cabbyIsActive = true;
-}
-
 //App Login
 $('#btnLogin').live('click', function () {
-    top.cabbyUser = $('#inpUsername').val();
-    top.cabbyPass = $('#inpPassword').val();
-    loginApp();
+    top.pinUser = $('#inpUsername').val();
+    top.pinPswd = $('#inpPassword').val();
+    appLogin();
 });
 
 //App Logout
 $('#btnLogout').live('click', function () {
-    logoutApp();
-    top.cabbyUser = '';
-    top.cabbyPass = '';
+    appLogout();
+    top.pinUser = '';
+    top.pinPswd = '';
 });
 
 //App Start
 $('#btnStart').live('click', function () {
     $('#btnStart').closest('.ui-btn').hide();
     $('#btnStop').closest('.ui-btn').show();
-    updateApp();
-    intervalApp();
+    appUpdate();
+    appInterval();
 });
 
 //App Stop
 $('#btnStop').live('click', function () {
-    stopApp();
+    appStop();
 });
