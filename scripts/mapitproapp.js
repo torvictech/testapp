@@ -3,8 +3,8 @@ top.updateId = '';
 top.pinUser = '';
 top.pinPswd = '';
 top.pinActive = '';
-//var wsURL = 'http://www.mapitpro.com/mipservice.asmx/';
-var wsURL = '../mipservice.asmx/';
+var wsURL = 'http://www.mapitpro.com/mipservice.asmx/';
+//var wsURL = '../mipservice.asmx/';
 
 //Supporting Functions
 function getLongDT() {
