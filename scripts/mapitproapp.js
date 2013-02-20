@@ -27,11 +27,15 @@ function appInterval() {
 }
 
 function internetError() {
-    alert('MapitPRO ERROR: Internet connectivity is unavailable!');
+    $('<div data-role="popup" id="popInternet" data-theme="a" data-position-to="window" data-transition="pop"><p>MapitPRO ALERT: Internet connectivity is unavailable... trying again!<p></div>').popup();
+    $('#popInternet').popup('open');
+    setTimeout(function () { $('#popInternet').popup('close'); }, 5000); //60,000 milliseconds is one minute
 }
 
 function technicalError() {
-    alert('MapitPRO ERROR: System is undergoing technical upgrades... Try again!');
+    $('<div data-role="popup" id="popTechnical" data-theme="a" data-position-to="window" data-transition="pop"><p>MapitPRO ALERT: System error... trying again!<p></div>').popup();
+    $('#popTechnical').popup('open');
+    setTimeout(function () { $('#popTechnical').popup('close'); }, 5000); //60,000 milliseconds is one minute
 }
 
 function appLogin() {
