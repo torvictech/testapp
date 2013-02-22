@@ -264,3 +264,18 @@ $('#btnStart').live('click', function () {
 $('#btnStop').live('click', function () {
     appStop();
 });
+
+//Refresh Handling Functions
+function disableF5(e) {
+    if (e.which == 116 || e.which == 8) {
+        e.preventDefault();
+    }
+};
+
+$(document).bind("keydown", disableF5);
+
+$(document).bind("contextmenu", function (e) {
+    e.preventDefault();
+});
+
+window.history.pushState(null, null, '../index.html')
