@@ -8,9 +8,9 @@
   <author href="http://www.mapitpro.com" email="info@mapitpro.com">TORViC Technologies, Inc.</author>
   
   <preference name="target-device" value="universal" />
-  <icon src="http://www.mapitpro.com/app/content/icons/mip.ico" />
-  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios57_24bit.png" gap:platform="ios" width="57" height="57" />
-  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios72_24bit.png" gap:platform="ios" width="72" height="72" />
-  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios114_24bit.png" gap:platform="ios" width="114" height="114" />
+  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios57.png" />
+  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios57.png" gap:platform="ios" width="57" height="57" />
+  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios72.png" gap:platform="ios" width="72" height="72" />
+  <icon src="http://www.mapitpro.com/app/content/icons/mip_ios114.png" gap:platform="ios" width="114" height="114" />
   
 </widget>
