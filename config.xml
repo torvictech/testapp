@@ -1,11 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<widget xmlns = "http://www.w3.org/ns/widgets" xmlns:gap = "http://phonegap.com/ns/1.0" id = "com.phonegap.example" versionCode="10" version = "1.0.0">
+<widget xmlns = "http://www.w3.org/ns/widgets" xmlns:gap = "http://phonegap.com/ns/1.0" id = "com.mapitpro.mobilecommand" version = "1.0.1">
 
-  <!-- versionCode is optional and Android only -->
+  <name>MapitPRO</name>
 
-  <name>PhoneGap MapitPRO</name>
-
-  <description>PhoneGap Build</description>
+  <description>MapitPRO Mobile Command for http://www.mapitpro.com - Real-Time Visual Business Insight!</description>
 
   <author href="http://www.mapitpro.com" email="info@mapitpro.com">TORViC Technologies, Inc.</author>
   
